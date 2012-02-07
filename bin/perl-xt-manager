@@ -1,0 +1,2 @@
+use XT::Manager;
+XT::Manager->run;
