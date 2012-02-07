@@ -15,24 +15,24 @@ class XT::Manager::Test
 		$XT::Manager::Test::AUTHORITY = 'cpan:TOBYINK';
 		$XT::Manager::Test::VERSION   = '0.001';
 	}
-
+	
 	use MooseX::Types::Moose qw/Undef/;
 	use MooseX::Types::Path::Class qw/Dir File/;
 	
 	has t_file => (
 		is       => 'ro',
 		isa      => File,
-      required => 1,
-      coerce   => 1,
+		required => 1,
+		coerce   => 1,
 		handles  => {
 			name     => 'basename',
 			}
 		);
-
+	
 	has config_file => (
 		is         => 'ro',
 		isa        => File|Undef,
-      coerce     => 1,
+		coerce     => 1,
 		lazy_build => 1,
 		);
 	
@@ -63,14 +63,14 @@ class XT::Manager::TestSet
 	has dir => (
 		is       => 'ro',
 		isa      => Dir,
-      required => 1,
-      coerce   => 1,
+		required => 1,
+		coerce   => 1,
 		);
 	
 	has tests => (
 		is       => 'rw',
 		isa      => 'ArrayRef[XT::Manager::Test]',
-      required => 1,
+		required => 1,
 		lazy     => 1,
 		builder  => '_build_tests',
 		);
@@ -131,7 +131,7 @@ class XT::Manager::TestSet
 			print $fh $old->slurp;
 			close $fh;
 			utime $old->stat->mtime, $old->stat->mtime, "$new";
-		};		
+		};
 		
 		$t_file = Path::Class::File->new("$dir", $t->t_file->basename);
 		$dump->($t->t_file, $t_file);
@@ -240,13 +240,13 @@ class XT::Manager::Comparison
 	has data => (
 		is       => 'ro',
 		isa      => 'HashRef',
-      required => 1,
+		required => 1,
 		);
 	
 	has [qw/left right/] => (
 		is       => 'ro',
 		isa      => 'XT::Manager::TestSet',
-      required => 1,
+		required => 1,
 		);
 	
 	method test_names ()
@@ -258,12 +258,12 @@ class XT::Manager::Comparison
 	{
 		return $self->data->{$name}{L};
 	}
-
+	
 	method right_has ($name)
 	{
 		return $self->data->{$name}{R};
 	}
-
+	
 	method status ($name)
 	{
 		my $L = $self->left_has($name);
@@ -275,7 +275,7 @@ class XT::Manager::Comparison
 		return RIGHT_NEWER if (  $L and  $R  and $L->[0] < $R->[0] );
 		return;
 	}
-
+	
 	method show ($verbose?)
 	{
 		my $str = '';
