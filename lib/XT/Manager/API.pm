@@ -16,7 +16,7 @@ class XT::Manager::Test
 		$XT::Manager::Test::VERSION   = '0.001';
 	}
 	
-	use MooseX::Types::Moose qw/Undef/;
+	use MooseX::Types::Moose ':all';
 	use MooseX::Types::Path::Class qw/Dir File/;
 	
 	has t_file => (
@@ -35,7 +35,7 @@ class XT::Manager::Test
 		coerce     => 1,
 		lazy_build => 1,
 		);
-	
+		
 	method _build_file (Str $extension)
 	{
 		my $abs = $self->t_file->absolute;
@@ -57,7 +57,7 @@ class XT::Manager::TestSet
 		$XT::Manager::TestSet::VERSION   = '0.001';
 	}
 	
-	use MooseX::Types::Moose;
+	use MooseX::Types::Moose ':all';
 	use MooseX::Types::Path::Class qw/Dir/;
 	
 	has dir => (
@@ -74,7 +74,13 @@ class XT::Manager::TestSet
 		lazy     => 1,
 		builder  => '_build_tests',
 		);
-	
+
+	has disposable_config_files => (
+		is         => 'ro',
+		isa        => Bool,
+		default    => 1,
+		);
+
 	method _build_tests ()
 	{
 		$self->dir->mkpath unless -d $self->dir;
@@ -139,7 +145,9 @@ class XT::Manager::TestSet
 		if ($t->has_config_file)
 		{
 			$config_file = Path::Class::File->new("$dir", $t->config_file->basename);
-			$dump->($t->config_file, $config_file);
+			$dump->($t->config_file, $config_file)
+				if $self->disposable_config_files
+				|| !(-e $config_file);
 		}
 		
 		my $object = XT::Manager::Test->new(
@@ -158,7 +166,12 @@ class XT::Manager::TestSet
 		die ("$orig not found in ".$self->dir) unless ref $t;
 		
 		$t->t_file->remove;
-		$t->config_file->remove if $t->has_config_file;
+		if ($t->has_config_file)
+		{
+			$t->config_file->remove
+				if $self->disposable_config_files
+				|| !(-e $t->config_file);
+		}
 		
 		my @tests =
 			grep { $_->name ne $t->name }
@@ -186,12 +199,18 @@ class XT::Manager::XTdir
 		$XT::Manager::XTdir::VERSION   = '0.001';
 	}
 	
+	use MooseX::Types::Moose ':all';
+	
 	has ignore_list => (
 		is         => 'ro',
-		isa        => 'Any',
+		isa        => Any,
 		lazy_build => 1,
 		);
-	
+
+	has '+disposable_config_files' => (
+		default    => 0,
+		);
+
 	method _build_ignore_list ()
 	{
 		$self->dir->mkpath unless -d $self->dir;
@@ -229,7 +248,9 @@ class XT::Manager::Comparison
 		$XT::Manager::Comparison::AUTHORITY = 'cpan:TOBYINK';
 		$XT::Manager::Comparison::VERSION   = '0.001';
 	}
-	
+
+	use MooseX::Types::Moose ':all';
+
 	use constant {
 		LEFT_ONLY     => '+   ',
 		RIGHT_ONLY    => '  ? ',
@@ -239,7 +260,7 @@ class XT::Manager::Comparison
 	
 	has data => (
 		is       => 'ro',
-		isa      => 'HashRef',
+		isa      => HashRef,
 		required => 1,
 		);
 	
