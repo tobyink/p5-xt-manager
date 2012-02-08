@@ -1,7 +1,7 @@
 package XT::Util;
 
-use 5.010;
-use common::sense;
+use 5.008;
+use strict;
 use utf8;
 
 our @EXPORT;
@@ -13,17 +13,33 @@ BEGIN {
 }
 
 use JSON qw/from_json/;
-
 use parent qw/Exporter/;
 
 sub __CONFIG__ (;$)
 {
 	my ($package, $file) = caller(0);
 	$file = shift if @_;
-	(my $config_file = $file) =~ s{\.t$}{};
-	$config_file .= '.config';
-	my $json = do { open my $fh, '<', $config_file; local $/ = <$fh> };
-	return from_json($json);
+	_config_file($file);
+}
+
+{
+	my %files;
+	sub _config_file
+	{
+		my $name = shift;
+		unless ($files{$name})
+		{
+			(my $config_file = $name) =~ s{\.t$}{};
+			$config_file .= '.config';
+			my $json = do {
+				open my $fh, '<', $config_file
+					or return $files{$name} = {};
+				local $/ = <$fh>
+				};
+			$files{$name} = from_json($json);
+		}
+		$files{$name};
+	}
 }
 
 __PACKAGE__
