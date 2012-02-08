@@ -48,6 +48,12 @@ class XT::Manager::Test
 	{
 		$self->_build_file('config');
 	}
+	
+	# meh
+	around has_config_file ()
+	{
+		defined $self->config_file;
+	}
 }
 
 class XT::Manager::TestSet
@@ -58,14 +64,6 @@ class XT::Manager::TestSet
 	}
 	
 	use MooseX::Types::Moose ':all';
-	use MooseX::Types::Path::Class qw/Dir/;
-	
-	has dir => (
-		is       => 'ro',
-		isa      => Dir,
-		required => 1,
-		coerce   => 1,
-		);
 	
 	has tests => (
 		is       => 'rw',
@@ -80,7 +78,48 @@ class XT::Manager::TestSet
 		isa        => Bool,
 		default    => 1,
 		);
+	
+	method _build_tests () { }
 
+	method is_ignored (Str $name)
+	{
+		return;
+	}
+	
+	method test (Str $name)
+	{
+		my @results = grep { $_->name eq $name } @{ $self->tests };
+		wantarray ? @results : $results[0];
+	}
+	
+	method add_test ()
+	{
+		confess "not implemented";
+	}
+
+	method remove_test ()
+	{
+		confess "not implemented";
+	}
+}
+
+role XT::Manager::FileSystemTestSet
+{
+	BEGIN {
+		$XT::Manager::FileSystemTestSet::AUTHORITY = 'cpan:TOBYINK';
+		$XT::Manager::FileSystemTestSet::VERSION   = '0.001';
+	}
+	
+	use MooseX::Types::Moose ':all';
+	use MooseX::Types::Path::Class qw/Dir/;
+	
+	has dir => (
+		is       => 'ro',
+		isa      => Dir,
+		required => 1,
+		coerce   => 1,
+		);
+	
 	method _build_tests ()
 	{
 		$self->dir->mkpath unless -d $self->dir;
@@ -112,22 +151,11 @@ class XT::Manager::TestSet
 			);
 	}
 	
-	method is_ignored (Str $name)
+	around add_test ($t)
 	{
-		return;
-	}
-	
-	method test (Str $name)
-	{
-		my @results = grep { $_->name eq $name } @{ $self->tests };
-		wantarray ? @results : $results[0];
-	}
-	
-	method add_test ($t)
-	{
-		my $orig = $t;
+		my $o = $t;
 		$t = $self->test($t) unless ref $t;
-		die ("$orig not found in ".$self->dir) unless ref $t;
+		die ("$o not found in ".$self->dir) unless ref $t;
 		
 		my $dir = $self->dir;
 		my ($t_file, $config_file);
@@ -159,11 +187,11 @@ class XT::Manager::TestSet
 		return $object;
 	}
 	
-	method remove_test ($t)
+	around remove_test ($t)
 	{
-		my $orig = $t;
+		my $o = $t;
 		$t = $self->test($t) unless ref $t;
-		die ("$orig not found in ".$self->dir) unless ref $t;
+		die ("$o not found in ".$self->dir) unless ref $t;
 		
 		$t->t_file->remove;
 		if ($t->has_config_file)
@@ -184,6 +212,7 @@ class XT::Manager::TestSet
 
 class XT::Manager::Repository
 	extends XT::Manager::TestSet
+	with XT::Manager::FileSystemTestSet
 {
 	BEGIN {
 		$XT::Manager::Repository::AUTHORITY = 'cpan:TOBYINK';
@@ -193,6 +222,7 @@ class XT::Manager::Repository
 
 class XT::Manager::XTdir
 	extends XT::Manager::TestSet
+	with XT::Manager::FileSystemTestSet
 {
 	BEGIN {
 		$XT::Manager::XTdir::AUTHORITY = 'cpan:TOBYINK';
