@@ -1,127 +1,131 @@
 package XT::Manager::API;
 
-use MooseX::Declare;
-no warnings;
-use common::sense;
+use strict;
 
 BEGIN {
 	$XT::Manager::API::AUTHORITY = 'cpan:TOBYINK';
 	$XT::Manager::API::VERSION   = '0.001';
 }
 
-class XT::Manager::Test
-{
-	BEGIN {
-		$XT::Manager::Test::AUTHORITY = 'cpan:TOBYINK';
-		$XT::Manager::Test::VERSION   = '0.001';
+BEGIN {
+	package XT::Manager::API::Syntax;
+	no thanks;
+	use Moose ();
+	use Moose::Role ();
+	use Syntax::Collector -collect => q{
+		use MooseX::Types::Moose 0 qw(-all);
+		use MooseX::Types::Path::Class 0 qw(File Dir);
+		use constant 0 { true => !!1, false => !!0 };
+		use constant 0 { read_only => 'ro', read_write => 'rw' };
+		no thanks 0.001;
+		use strict 0;
+		use warnings 0;
+	};
+	sub IMPORT {
+		if (grep { /^-role$/ } @_)
+			{ @_ = (); goto( Moose::Role::->can('import') ) }
+		if (grep { /^-class$/ } @_)
+			{ @_ = (); goto( Moose::->can('import') ) }
 	}
-	
-	use MooseX::Types::Moose ':all';
-	use MooseX::Types::Path::Class qw/Dir File/;
+}
+
+BEGIN {
+	package XT::Manager::Exception::FileNotFound;
+	use XT::Manager::API::Syntax -class;
+	with qw(Throwable)
+}
+
+BEGIN {
+	package XT::Manager::Test;
+	use XT::Manager::API::Syntax -class;
 	
 	has t_file => (
-		is       => 'ro',
+		is       => read_only,
 		isa      => File,
-		required => 1,
-		coerce   => 1,
+		required => true,
+		coerce   => true,
 		handles  => {
 			name     => 'basename',
-			}
-		);
+		}
+	);
 	
 	has config_file => (
-		is         => 'ro',
+		is         => read_only,
 		isa        => File|Undef,
-		coerce     => 1,
-		lazy_build => 1,
-		);
+		coerce     => true,
+		lazy_build => true,
+	);
 		
-	method _build_file (Str $extension)
+	sub _build_file
 	{
+		my ($self, $extension) = @_;
 		my $abs = $self->t_file->absolute;
 		$abs =~ s/\.\Kt$/$extension/;
 		return unless -f $abs;
 		return $abs;
 	}
 	
-	method _build_config_file ()
+	sub _build_config_file
 	{
-		$self->_build_file('config');
+		shift->_build_file('config');
 	}
 	
 	# meh
-	around has_config_file ()
+	around has_config_file => sub
 	{
-		defined $self->config_file;
-	}
+		my ($orig, $self) = @_;
+		return defined $self->config_file;
+	};
 }
 
-class XT::Manager::TestSet
-{
-	BEGIN {
-		$XT::Manager::TestSet::AUTHORITY = 'cpan:TOBYINK';
-		$XT::Manager::TestSet::VERSION   = '0.001';
-	}
-	
-	use MooseX::Types::Moose ':all';
+BEGIN {
+	package XT::Manager::TestSet;
+	use XT::Manager::API::Syntax -role;
+
+	requires qw(
+		add_test
+		remove_test
+		_build_tests
+		_build_disposable_config_files
+	);
 	
 	has tests => (
-		is       => 'rw',
-		isa      => 'ArrayRef[XT::Manager::Test]',
-		required => 1,
-		lazy     => 1,
-		builder  => '_build_tests',
-		);
+		is         => read_write,
+		isa        => ArrayRef[ 'XT::Manager::Test' ],
+		lazy_build => true,
+	);
 
 	has disposable_config_files => (
-		is         => 'ro',
+		is         => read_only,
 		isa        => Bool,
-		default    => 1,
-		);
+		lazy_build => true,
+	);
 	
-	method _build_tests () { }
-
-	method is_ignored (Str $name)
-	{
-		return;
-	}
+	sub is_ignored { +return }
 	
-	method test (Str $name)
+	sub test
 	{
+		my ($self, $name) = @_;
 		my @results = grep { $_->name eq $name } @{ $self->tests };
 		wantarray ? @results : $results[0];
 	}
-	
-	method add_test ()
-	{
-		confess "not implemented";
-	}
-
-	method remove_test ()
-	{
-		confess "not implemented";
-	}
 }
 
-role XT::Manager::FileSystemTestSet
-{
-	BEGIN {
-		$XT::Manager::FileSystemTestSet::AUTHORITY = 'cpan:TOBYINK';
-		$XT::Manager::FileSystemTestSet::VERSION   = '0.001';
-	}
-	
-	use MooseX::Types::Moose ':all';
-	use MooseX::Types::Path::Class qw/Dir/;
+BEGIN {
+	package XT::Manager::FileSystemTestSet;
+	use XT::Manager::API::Syntax -role;	
+	with qw(XT::Manager::TestSet);
 	
 	has dir => (
-		is       => 'ro',
+		is       => read_only,
 		isa      => Dir,
-		required => 1,
-		coerce   => 1,
-		);
+		required => true,
+		coerce   => true,
+	);
 	
-	method _build_tests ()
+	sub _build_tests
 	{
+		my $self = shift;
 		$self->dir->mkpath unless -d $self->dir;
 		
 		my @tests =
@@ -131,9 +135,12 @@ role XT::Manager::FileSystemTestSet
 		
 		$self->tests(\@tests);
 	}
-	
-	method compare ($other)
+
+	sub _build_disposable_config_files { true }
+
+	sub compare
 	{
+		my ($self, $other) = @_;
 		my %results;
 		foreach my $t (@{ $self->tests })
 		{
@@ -148,14 +155,18 @@ role XT::Manager::FileSystemTestSet
 			left  => $self,
 			right => $other,
 			data  => \%results,
-			);
+		);
 	}
 	
-	around add_test ($t)
+	sub add_test
 	{
+		my ($self, $t) = @_;
 		my $o = $t;
 		$t = $self->test($t) unless ref $t;
-		die ("$o not found in ".$self->dir) unless ref $t;
+		
+		XT::Manager::Exception::FileNotFound->throw(
+			message => "$o not found in ".$self->dir
+		) unless ref $t;
 		
 		my $dir = $self->dir;
 		my ($t_file, $config_file);
@@ -181,17 +192,21 @@ role XT::Manager::FileSystemTestSet
 		my $object = XT::Manager::Test->new(
 			t_file      => $t_file,
 			config_file => $config_file,
-			);
+		);
 		push @{ $self->tests }, $object;
 		
 		return $object;
 	}
 	
-	around remove_test ($t)
+	sub remove_test
 	{
+		my ($self, $t) = @_;
 		my $o = $t;
 		$t = $self->test($t) unless ref $t;
-		die ("$o not found in ".$self->dir) unless ref $t;
+		
+		XT::Manager::Exception::FileNotFound->throw(
+			"$o not found in ".$self->dir
+		) unless ref $t;
 		
 		$t->t_file->remove;
 		if ($t->has_config_file)
@@ -210,39 +225,28 @@ role XT::Manager::FileSystemTestSet
 	}
 }
 
-class XT::Manager::Repository
-	extends XT::Manager::TestSet
-	with XT::Manager::FileSystemTestSet
-{
-	BEGIN {
-		$XT::Manager::Repository::AUTHORITY = 'cpan:TOBYINK';
-		$XT::Manager::Repository::VERSION   = '0.001';
-	}
+BEGIN {
+	package XT::Manager::Repository;
+	use XT::Manager::API::Syntax -class;	
+	with qw(XT::Manager::FileSystemTestSet);
 }
 
-class XT::Manager::XTdir
-	extends XT::Manager::TestSet
-	with XT::Manager::FileSystemTestSet
-{
-	BEGIN {
-		$XT::Manager::XTdir::AUTHORITY = 'cpan:TOBYINK';
-		$XT::Manager::XTdir::VERSION   = '0.001';
-	}
-	
-	use MooseX::Types::Moose ':all';
-	
+BEGIN {
+	package XT::Manager::XTdir;
+	use XT::Manager::API::Syntax -class;	
+	with qw(XT::Manager::FileSystemTestSet);
+
 	has ignore_list => (
-		is         => 'ro',
+		is         => read_only,
 		isa        => Any,
-		lazy_build => 1,
-		);
+		lazy_build => true,
+	);
 
-	has '+disposable_config_files' => (
-		default    => 0,
-		);
+	sub _build_disposable_config_files { false }
 
-	method _build_ignore_list ()
+	sub _build_ignore_list
 	{
+		my $self = shift;
 		$self->dir->mkpath unless -d $self->dir;
 		
 		my $file  = Path::Class::File->new($self->dir, '.xt-ignore');
@@ -254,14 +258,16 @@ class XT::Manager::XTdir
 		return \@ignore;
 	}
 	
-	method is_ignored (Str $name)
+	sub is_ignored
 	{
-		return 1 if $name ~~ $self->ignore_list;
+		my ($self, $name) = @_;
+		return true if $name ~~ $self->ignore_list;
 		return;
 	}
 	
-	method add_ignore (Str $string)
+	sub add_ignore
 	{
+		my ($self, $string) = @_;
 		$self->dir->mkpath unless -d $self->dir;
 		
 		my $file  = Path::Class::File->new($self->dir, '.xt-ignore');
@@ -272,51 +278,50 @@ class XT::Manager::XTdir
 	}
 }
 
-class XT::Manager::Comparison
-{
-	BEGIN {
-		$XT::Manager::Comparison::AUTHORITY = 'cpan:TOBYINK';
-		$XT::Manager::Comparison::VERSION   = '0.001';
-	}
-
-	use MooseX::Types::Moose ':all';
+BEGIN {
+	package XT::Manager::Comparison;
+	use XT::Manager::API::Syntax -class;	
 
 	use constant {
 		LEFT_ONLY     => '+   ',
 		RIGHT_ONLY    => '  ? ',
 		LEFT_NEWER    => 'U   ',
 		RIGHT_NEWER   => '  M ',
-		};
+	};
 	
 	has data => (
-		is       => 'ro',
+		is       => read_only,
 		isa      => HashRef,
-		required => 1,
-		);
+		required => true,
+	);
 	
 	has [qw/left right/] => (
-		is       => 'ro',
-		isa      => 'XT::Manager::TestSet',
-		required => 1,
-		);
+		is       => read_only,
+		does     => 'XT::Manager::TestSet',
+		required => true,
+	);
 	
-	method test_names ()
+	sub test_names
 	{
+		my $self = shift;
 		sort keys %{ $self->data };
 	}
 	
-	method left_has ($name)
+	sub left_has
 	{
+		my ($self, $name) = @_;
 		return $self->data->{$name}{L};
 	}
 	
-	method right_has ($name)
+	sub right_has
 	{
+		my ($self, $name) = @_;
 		return $self->data->{$name}{R};
 	}
 	
-	method status ($name)
+	sub status
 	{
+		my ($self, $name) = @_;
 		my $L = $self->left_has($name);
 		my $R = $self->right_has($name);
 		
@@ -327,8 +332,10 @@ class XT::Manager::Comparison
 		return;
 	}
 	
-	method show ($verbose?)
+	sub show
 	{
+		my ($self, $verbose) = @_;
+		
 		my $str = '';
 		foreach my $t ($self->test_names)
 		{
@@ -347,8 +354,9 @@ class XT::Manager::Comparison
 		return $str;
 	}
 	
-	method should_pull ()
+	sub should_pull
 	{
+		my $self = shift;
 		grep
 		{
 			my $f = $_;
@@ -383,8 +391,6 @@ This module defines the following classes:
 
 =item * C<< XT::Manager::Test >> - a single test file
 
-=item * C<< XT::Manager::TestSet >> - a set of test files
-
 =item * C<< XT::Manager::Repository >> - a repository of test files
 
 =item * C<< XT::Manager::XTdir >> - an "xt" directory
@@ -392,6 +398,8 @@ This module defines the following classes:
 =item * C<< XT::Manager::Comparison >> - the result of comparing two TestSet objects
 
 =back
+
+And a bunch of Moose roles.
 
 The source code of the C<< XT::Manager::Command::* >> modules are fairly
 good examples of how these classes can be used.
