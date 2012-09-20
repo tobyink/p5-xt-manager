@@ -1,7 +1,7 @@
 package XT::Manager::Command::remove;
 
 use 5.010;
-use common::sense;
+use strict;
 use utf8;
 
 BEGIN {
@@ -9,7 +9,7 @@ BEGIN {
 	$XT::Manager::Command::remove::VERSION   = '0.001';
 }
 
-use parent qw/XT::Manager::Command/;
+use base qw/XT::Manager::Command/;
 
 sub abstract
 {

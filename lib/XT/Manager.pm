@@ -1,7 +1,7 @@
 package XT::Manager;
 
 use 5.010;
-use common::sense;
+use strict;
 use utf8;
 
 BEGIN {

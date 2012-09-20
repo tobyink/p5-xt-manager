@@ -4,5 +4,12 @@
 	perl_version_from m`XT::Manager`;
 	version_from      m`XT::Manager`;
 	readme_from       m`XT::Manager`;
+	requires          p`thanks 0.001`;
+	requires          p`App::Cmd 0`;
+	requires          p`Moose 2.00`;
+	requires          p`MooseX::Types::Moose 0`;
+	requires          p`MooseX::Types::Path::Class 0`;
+	requires          p`Syntax::Collector 0.004`;
+	requires          p`XT::Util 0.001`;
 	test_requires     p`Test::More 0.61`.
 

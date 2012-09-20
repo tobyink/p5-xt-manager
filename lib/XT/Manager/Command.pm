@@ -1,7 +1,7 @@
 package XT::Manager::Command;
 
 use 5.010;
-use common::sense;
+use strict;
 use utf8;
 
 BEGIN {
@@ -9,7 +9,7 @@ BEGIN {
 	$XT::Manager::Command::VERSION   = '0.001';
 }
 
-use parent qw/App::Cmd::Command/;
+use base qw/App::Cmd::Command/;
 
 use XT::Manager::API;
 use Cwd;
