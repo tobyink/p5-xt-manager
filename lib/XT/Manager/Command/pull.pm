@@ -6,7 +6,7 @@ use utf8;
 
 BEGIN {
 	$XT::Manager::Command::pull::AUTHORITY = 'cpan:TOBYINK';
-	$XT::Manager::Command::pull::VERSION   = '0.002';
+	$XT::Manager::Command::pull::VERSION   = '0.003';
 }
 
 use base qw/XT::Manager::Command/;
