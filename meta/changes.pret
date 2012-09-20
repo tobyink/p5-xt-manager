@@ -9,3 +9,9 @@
 	changeset [
 		item "Declare dependency on Throwable."^^Packaging;
 	].
+
+`XT-Manager 0.003 cpan:TOBYINK`
+	issued  2012-09-20;
+	changeset [
+		item "Fix version number for XT::Manager::Command::push."^^Bugfix;
+	].

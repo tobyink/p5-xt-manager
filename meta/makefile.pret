@@ -4,6 +4,7 @@
 	perl_version_from m`XT::Manager`;
 	version_from      m`XT::Manager`;
 	readme_from       m`XT::Manager`;
+	install_script    f`bin/perl-xt-manager`;
 	requires          p`thanks 0.001`;
 	requires          p`App::Cmd 0`;
 	requires          p`Moose 2.00`;
