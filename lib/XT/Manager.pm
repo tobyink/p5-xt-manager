@@ -6,7 +6,7 @@ use utf8;
 
 BEGIN {
 	$XT::Manager::AUTHORITY = 'cpan:TOBYINK';
-	$XT::Manager::VERSION   = '0.001';
+	$XT::Manager::VERSION   = '0.002';
 
 	*allow_any_unambiguous_abbrev = sub { 1 };
 }

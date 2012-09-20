@@ -10,6 +10,7 @@
 	requires          p`MooseX::Types::Moose 0`;
 	requires          p`MooseX::Types::Path::Class 0`;
 	requires          p`Syntax::Collector 0.004`;
+	requires          p`Throwable 0`;
 	requires          p`XT::Util 0.001`;
 	test_requires     p`Test::More 0.61`.
 

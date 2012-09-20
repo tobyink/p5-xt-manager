@@ -4,3 +4,8 @@
 	issued  2012-09-20;
 	label   "Initial release".
 
+`XT-Manager 0.002 cpan:TOBYINK`
+	issued  2012-09-20;
+	changeset [
+		item "Declare dependency on Throwable."^^Packaging;
+	].
