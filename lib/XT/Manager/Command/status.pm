@@ -23,17 +23,17 @@ sub command_names
 
 sub description
 {
-	<<'	DESCRIPTION'
+	<<'DESCRIPTION'
 The status symbols for each test case should be interpreted as:
 
-  +  New file available to be pulled from repository
-  U  Updated version available to be pulled from repository
-  ?  Local test case that is not in repository
-  M  Local test case modified, and is different from repository
+	+  New file available to be pulled from repository
+	U  Updated version available to be pulled from repository
+	?  Local test case that is not in repository
+	M  Local test case modified, and is different from repository
 
 Whether test cases are identical, and which test case is newer, is judged
 entirely by file modification time.
-	DESCRIPTION
+DESCRIPTION
 }
 
 sub execute
@@ -49,8 +49,9 @@ sub opt_spec
 {
 	my $self = shift;
 	return (
-		[ "verbose|v",
-		  "increase verbosity",
+		[
+			"verbose|v",
+			"increase verbosity",
 		],
 		$self->SUPER::opt_spec(@_),
 	);

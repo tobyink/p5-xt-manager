@@ -38,12 +38,8 @@ sub opt_spec
 {
 	my $self = shift;
 	return (
-		[ "verbose|v",
-		  "increase verbosity",
-		],
-		[ "all|a",
-		  "pull all changes from repository",
-		],
+		[ "verbose|v",    "increase verbosity" ],
+		[ "all|a",        "pull all changes from repository" ],
 		$self->SUPER::opt_spec(@_),
 	);
 }
@@ -51,8 +47,7 @@ sub opt_spec
 sub validate_args
 {
 	my ($self, $opts, $args) = @_;
-	$self->usage_error("No arguments provided, and '--all' option not specified!")
-		unless $opts->{all} || @$args;
+	$self->usage_error("No arguments provided, and '--all' option not specified!") unless $opts->{all} || @$args;
 }
 
 __PACKAGE__

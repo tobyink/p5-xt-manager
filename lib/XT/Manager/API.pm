@@ -21,11 +21,16 @@ BEGIN {
 		use strict 0;
 		use warnings 0;
 	};
-	sub IMPORT {
+	sub IMPORT
+	{
 		if (grep { /^-role$/ } @_)
-			{ @_ = (); goto( Moose::Role::->can('import') ) }
+		{
+			@_ = (); goto( Moose::Role::->can('import') )
+		}
 		if (grep { /^-class$/ } @_)
-			{ @_ = (); goto( Moose::->can('import') ) }
+		{
+			@_ = (); goto( Moose::->can('import') )
+		}
 	}
 }
 
@@ -55,7 +60,7 @@ BEGIN {
 		coerce     => true,
 		lazy_build => true,
 	);
-		
+	
 	sub _build_file
 	{
 		my ($self, $extension) = @_;
@@ -113,7 +118,7 @@ BEGIN {
 
 BEGIN {
 	package XT::Manager::FileSystemTestSet;
-	use XT::Manager::API::Syntax -role;	
+	use XT::Manager::API::Syntax -role;
 	with qw(XT::Manager::TestSet);
 	
 	has dir => (
@@ -184,9 +189,7 @@ BEGIN {
 		if ($t->has_config_file)
 		{
 			$config_file = Path::Class::File->new("$dir", $t->config_file->basename);
-			$dump->($t->config_file, $config_file)
-				if $self->disposable_config_files
-				|| !(-e $config_file);
+			$dump->($t->config_file, $config_file) if $self->disposable_config_files || !(-e $config_file);
 		}
 		
 		my $object = XT::Manager::Test->new(
@@ -211,29 +214,23 @@ BEGIN {
 		$t->t_file->remove;
 		if ($t->has_config_file)
 		{
-			$t->config_file->remove
-				if $self->disposable_config_files
-				|| !(-e $t->config_file);
+			$t->config_file->remove if $self->disposable_config_files || !(-e $t->config_file);
 		}
 		
-		my @tests =
-			grep { $_->name ne $t->name }
-			@{ $self->tests };
-		$self->tests(\@tests);
-		
+		$self->tests([ grep { $_->name ne $t->name } @{ $self->tests } ]);
 		return $self;
 	}
 }
 
 BEGIN {
 	package XT::Manager::Repository;
-	use XT::Manager::API::Syntax -class;	
+	use XT::Manager::API::Syntax -class;
 	with qw(XT::Manager::FileSystemTestSet);
 }
 
 BEGIN {
 	package XT::Manager::XTdir;
-	use XT::Manager::API::Syntax -class;	
+	use XT::Manager::API::Syntax -class;
 	with qw(XT::Manager::FileSystemTestSet);
 
 	has ignore_list => (
@@ -280,7 +277,7 @@ BEGIN {
 
 BEGIN {
 	package XT::Manager::Comparison;
-	use XT::Manager::API::Syntax -class;	
+	use XT::Manager::API::Syntax -class;
 
 	use constant {
 		LEFT_ONLY     => '+   ',

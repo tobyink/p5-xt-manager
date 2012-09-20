@@ -18,13 +18,15 @@ sub opt_spec
 {
 	my ($self) = @_;
 	return (
-		[ "repo|R=s",
-		  sprintf("custom xt repository path [default: %s]", $self->_default_repo),
-		  {default => $self->_default_repo},
+		[
+			"repo|R=s",
+			sprintf("custom xt repository path [default: %s]", $self->_default_repo),
+			{ default => $self->_default_repo },
 		],
-		[ "xtdir|X=s",
-		  sprintf("local xt directory [default: %s]", $self->_default_xtdir),
-		  {default => $self->_default_xtdir},
+		[
+			"xtdir|X=s",
+			sprintf("local xt directory [default: %s]", $self->_default_xtdir),
+			{ default => $self->_default_xtdir },
 		],
 	);
 }
@@ -39,12 +41,12 @@ sub _default_xtdir
 	(cwd =~ m{[\\\/]xt$}) ? '.' : 'xt';
 }
 
-sub get_repository 
+sub get_repository
 {
 	my ($self, $opts) = @_;
 	return XT::Manager::Repository->new(
 		dir => ($opts->{repo} // $self->_default_repo),
-		);
+	);
 }
 
 sub get_xtdir
@@ -52,7 +54,7 @@ sub get_xtdir
 	my ($self, $opts) = @_;
 	return XT::Manager::XTdir->new(
 		dir => ($opts->{xtdir} // $self->_default_xtdir),
-		);
+	);
 }
 
 __PACKAGE__

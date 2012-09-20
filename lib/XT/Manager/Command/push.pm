@@ -33,8 +33,9 @@ sub opt_spec
 {
 	my $self = shift;
 	return (
-		[ "verbose|v",
-		  "increase verbosity",
+		[
+			"verbose|v",
+			"increase verbosity",
 		],
 		$self->SUPER::opt_spec(@_),
 	);
@@ -43,8 +44,7 @@ sub opt_spec
 sub validate_args
 {
 	my ($self, $opts, $args) = @_;
-	$self->usage_error("No arguments provided!")
-		unless @$args;
+	$self->usage_error("No arguments provided!") unless @$args;
 }
 
 __PACKAGE__

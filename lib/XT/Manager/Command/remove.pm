@@ -39,8 +39,9 @@ sub opt_spec
 {
 	my $self = shift;
 	return (
-		[ "both|b",
-		  "remove at repository end too",
+		[
+			"both|b",
+			"remove at repository end too",
 		],
 		$self->SUPER::opt_spec(@_),
 	);
