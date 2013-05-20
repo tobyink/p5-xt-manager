@@ -4,7 +4,7 @@ use strict;
 
 BEGIN {
 	$XT::Manager::API::AUTHORITY = 'cpan:TOBYINK';
-	$XT::Manager::API::VERSION   = '0.003';
+	$XT::Manager::API::VERSION   = '0.004';
 };
 
 BEGIN {

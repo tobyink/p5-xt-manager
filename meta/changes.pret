@@ -15,3 +15,13 @@
 	changeset [
 		item "Fix version number for XT::Manager::Command::push."^^Bugfix;
 	].
+
+`XT-Manager 0.004 cpan:TOBYINK`
+	issued  2013-05-20;
+	label   "faster please!";
+	changeset [
+		item "Moose -> Moo."^^Change;
+		item "Path::Class -> Path::Tiny."^^Change;
+		item "smartmatch -> match::smart."^^Change;
+		item "MooseX::Types -> Type::Tiny."^^Change;
+	].
