@@ -1,8 +1,7 @@
 package XT::Manager::Command::remove;
 
-use 5.010;
+use 5.008003;
 use strict;
-use utf8;
 
 BEGIN {
 	$XT::Manager::Command::remove::AUTHORITY = 'cpan:TOBYINK';

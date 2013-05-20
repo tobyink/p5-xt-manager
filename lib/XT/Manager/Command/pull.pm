@@ -1,8 +1,7 @@
 package XT::Manager::Command::pull;
 
-use 5.010;
+use 5.008003;
 use strict;
-use utf8;
 
 BEGIN {
 	$XT::Manager::Command::pull::AUTHORITY = 'cpan:TOBYINK';

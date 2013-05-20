@@ -1,8 +1,7 @@
 package XT::Manager::Command;
 
-use 5.010;
+use 5.008003;
 use strict;
-use utf8;
 
 BEGIN {
 	$XT::Manager::Command::AUTHORITY = 'cpan:TOBYINK';
@@ -33,7 +32,9 @@ sub opt_spec
 
 sub _default_repo
 {
-	$ENV{PERL_XT_MANAGER_DIR} // "$ENV{HOME}/perl5/xt";
+	defined $ENV{PERL_XT_MANAGER_DIR}
+		? $ENV{PERL_XT_MANAGER_DIR}
+		: "$ENV{HOME}/perl5/xt";
 }
 
 sub _default_xtdir
@@ -44,16 +45,16 @@ sub _default_xtdir
 sub get_repository
 {
 	my ($self, $opts) = @_;
-	return XT::Manager::Repository->new(
-		dir => ($opts->{repo} // $self->_default_repo),
+	return "XT::Manager::Repository"->new(
+		dir => (defined $opts->{repo} ? $opts->{repo} : $self->_default_repo),
 	);
 }
 
 sub get_xtdir
 {
 	my ($self, $opts) = @_;
-	return XT::Manager::XTdir->new(
-		dir => ($opts->{xtdir} // $self->_default_xtdir),
+	return "XT::Manager::XTdir"->new(
+		dir => (defined $opts->{xtdir} ? $opts->{xtdir} : $self->_default_xtdir),
 	);
 }
 

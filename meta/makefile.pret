@@ -5,13 +5,14 @@
 	version_from      m`XT::Manager`;
 	readme_from       m`XT::Manager`;
 	install_script    f`bin/perl-xt-manager`;
+	requires          p`match::simple 0.004`;
 	requires          p`thanks 0.001`;
-	requires          p`App::Cmd 0`;
-	requires          p`Moose 2.00`;
-	requires          p`MooseX::Types::Moose 0`;
-	requires          p`MooseX::Types::Path::Class 0`;
+	requires          p`App::Cmd 0.300`;
+	requires          p`Moo 1.002000`;
+	requires          p`Path::Tiny 0.017`;
 	requires          p`Syntax::Collector 0.004`;
-	requires          p`Throwable 0`;
+	requires          p`Throwable 0.200000`;
+	requires          p`Types::Standard 0.004`;
 	requires          p`XT::Util 0.001`;
-	test_requires     p`Test::More 0.61`.
+	test_requires     p`Test::More 0.96`.
 
