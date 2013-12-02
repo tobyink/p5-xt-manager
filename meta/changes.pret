@@ -35,6 +35,7 @@
 			label "Cope with changes to Syntax::Collector.";
 			dcs:fixes RT#90620;
 			dcs:thanks cpan:ANDK;
+		];
 	].
 
 cpan:ANDK
