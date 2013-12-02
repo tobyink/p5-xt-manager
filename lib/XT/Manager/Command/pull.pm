@@ -5,7 +5,7 @@ use strict;
 
 BEGIN {
 	$XT::Manager::Command::pull::AUTHORITY = 'cpan:TOBYINK';
-	$XT::Manager::Command::pull::VERSION   = '0.004';
+	$XT::Manager::Command::pull::VERSION   = '0.005';
 }
 
 use base qw/XT::Manager::Command/;

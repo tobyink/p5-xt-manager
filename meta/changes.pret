@@ -25,3 +25,10 @@
 		item "smartmatch -> match::smart."^^Change;
 		item "MooseX::Types -> Type::Tiny."^^Change;
 	].
+
+`XT-Manager 0.005 cpan:TOBYINK`
+	issued  2013-12-02;
+	changeset [
+		item "use Dist::Inkt."^^Packaging;
+		item "Cope with changes to Syntax::Collector."^^Update;
+	].
