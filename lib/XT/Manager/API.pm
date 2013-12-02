@@ -81,6 +81,7 @@ BEGIN {
 	no thanks;
 	use Moo ();
 	use Moo::Role ();
+	use Import::Into ();
 	use Syntax::Collector -collect => q{
 		use Types::Standard 0 -types;
 		use XT::Manager::API::Types 0 -types;
@@ -91,20 +92,13 @@ BEGIN {
 		use strict 0;
 		use warnings 0;
 	};
-	sub IMPORT
+	sub _exporter_validate_opts
 	{
-		if (grep { /^-role$/ } @_)
-		{
-			@_ = ("Moo::Role");
-			my $import = $_[0]->can('import');
-			goto $import;
-		}
-		if (grep { /^-class$/ } @_)
-		{
-			@_ = ("Moo");
-			my $import = $_[0]->can('import');
-			goto $import;
-		}
+		my $me     = shift;
+		my ($opts) = @_;
+		'Moo::Role'->import::into($opts->{into}) if $opts->{role};
+		'Moo'->import::into($opts->{into}) if $opts->{class};
+		$me->SUPER::_exporter_validate_opts(@_);
 	}
 }
 
