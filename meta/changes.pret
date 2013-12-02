@@ -30,5 +30,13 @@
 	issued  2013-12-02;
 	changeset [
 		item "use Dist::Inkt."^^Packaging;
-		item "Cope with changes to Syntax::Collector."^^Update;
+		item [
+			a dcs:Update, dcs:Bugfix;
+			label "Cope with changes to Syntax::Collector.";
+			dcs:fixes RT#90620;
+			dcs:thanks cpan:ANDK;
 	].
+
+cpan:ANDK
+	foaf:name "Andreas J König".
+
