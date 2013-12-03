@@ -41,3 +41,8 @@
 cpan:ANDK
 	foaf:name "Andreas J König".
 
+`XT-Manager 0.006 cpan:TOBYINK`
+	issued  2013-12-03;
+	changeset [
+		item "Bump required version of Syntax::Collector."^^Packaging;
+	].
